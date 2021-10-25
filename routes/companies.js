@@ -15,15 +15,30 @@ router.get("/", async (req, res, next) => {
 	}
 });
 
-// Return obj of company
+// Return obj of company with array of its invoices
 router.get("/:code", async (req, res, next) => {
 	try {
 		const { code } = req.params;
-		const results = await db.query(`SELECT * FROM companies WHERE code=$1`, [ code ]);
-		if (results.rows.length === 0) {
+
+		const compResult = await db.query(`SELECT * FROM companies WHERE code=$1`, [ code ]);
+
+		const invResult = await db.query(
+			`SELECT id
+			FROM invoices
+			WHERE comp_code = $1`,
+			[ code ]
+		);
+
+		if (compResult.rows.length === 0) {
 			throw new ExpressError(`Can't find company with code ${code}`, 404);
 		}
-		return res.send({ company: results.rows[0] });
+
+		const company = compResult.rows[0];
+		const invoices = invResult.rows;
+
+		company.invoices = invoices.map((invoice) => invoice.id);
+
+		return res.send({ company: company });
 	} catch (e) {
 		return next(e);
 	}
