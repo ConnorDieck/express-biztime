@@ -84,7 +84,8 @@ router.put("/:id", async (req, res, next) => {
 			"UPDATE invoices SET amt=$1 WHERE id=$2 RETURNING id, comp_code, amt, paid, add_date, paid_date",
 			[ amt, id ]
 		);
-		if (results.rows === 0) {
+		console.log(results);
+		if (results.rows.length === 0) {
 			throw new ExpressError(`Can't find invoice with id ${id}`, 404);
 		}
 		return res.send({ invoice: results.rows[0] });
@@ -96,8 +97,12 @@ router.put("/:id", async (req, res, next) => {
 // Deletes invoice
 router.delete("/:id", async (req, res, next) => {
 	try {
+		const resTest = await db.query("SELECT * FROM invoices WHERE id = $1", [ req.params.id ]);
+		if (resTest.rows.length === 0) {
+			throw new ExpressError(`Can't find invoice with id '${req.params.id}'`, 404);
+		}
 		const results = db.query("DELETE FROM invoices WHERE id = $1", [ req.params.id ]);
-		return res.send({ status: "deleted" });
+		return res.send({ msg: "deleted" });
 	} catch (e) {
 		return next(e);
 	}

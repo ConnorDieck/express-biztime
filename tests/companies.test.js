@@ -48,7 +48,7 @@ describe("GET /companies/:code", () => {
 	});
 });
 
-describe("POST /company", () => {
+describe("POST /companies", () => {
 	test("Posts a new company", async () => {
 		const resp = await request(app).post("/companies").send({
 			code: "apple",
@@ -66,7 +66,7 @@ describe("POST /company", () => {
 	});
 });
 
-describe("PUT /company/:code", () => {
+describe("PUT /companies/:code", () => {
 	test("Updates an existing company", async () => {
 		const resp = await request(app).put(`/companies/${testCompany.code}`).send({
 			name: "Apple Computers",

@@ -20,7 +20,7 @@ beforeEach(async () => {
 	testInvoice = invResult.rows[0];
 	testInvoice.company = testCompany;
 	// add_date is returning as a string from the db
-	testInvoice.add_date = "2021-10-26T04:00:00.000Z";
+	testInvoice.add_date = "2021-10-27T04:00:00.000Z";
 });
 
 afterEach(async () => {
@@ -74,7 +74,7 @@ describe("POST /invoices", () => {
 				comp_code: "fbk",
 				amt: 999,
 				id: expect.any(Number),
-				add_date: "2021-10-26T04:00:00.000Z",
+				add_date: "2021-10-27T04:00:00.000Z",
 				paid_date: null,
 				paid: false
 			}
@@ -82,48 +82,49 @@ describe("POST /invoices", () => {
 	});
 });
 
-// describe("PUT /company/:code", () => {
-// 	test("Updates an existing company", async () => {
-// 		const resp = await request(app).put(`/companies/${testCompany.code}`).send({
-// 			name: "Apple Computers",
-// 			description: "Maker of OS X"
-// 		});
-// 		expect(resp.statusCode).toEqual(200);
-// 		expect(resp.body).toEqual({
-// 			company: {
-// 				code: "fbk",
-// 				name: "Apple Computers",
-// 				description: "Maker of OS X"
-// 			}
-// 		});
-// 	});
+describe("PUT /invoices/:id", () => {
+	test("Updates an existing invoice", async () => {
+		const resp = await request(app).put(`/invoices/${testInvoice.id}`).send({
+			amt: 999
+		});
+		expect(resp.statusCode).toEqual(200);
+		expect(resp.body).toEqual({
+			invoice: {
+				comp_code: "fbk",
+				amt: 999,
+				id: expect.any(Number),
+				add_date: "2021-10-27T04:00:00.000Z",
+				paid_date: null,
+				paid: false
+			}
+		});
+	});
 
-// 	test("Responds with 404 when given an invalid code", async () => {
-// 		const resp = await request(app).put(`/companies/invalid`).send({
-// 			name: "Apple Computers",
-// 			description: "Maker of OS X"
-// 		});
-// 		expect(resp.statusCode).toEqual(404);
-// 	});
-// });
+	test("Responds with 404 when given an invalid id", async () => {
+		const resp = await request(app).put(`/invoices/0`).send({
+			amt: 999
+		});
+		expect(resp.statusCode).toEqual(404);
+	});
+});
 
-// describe("DELETE /companies/:code", () => {
-// 	test("Deletes company obj with matching code", async () => {
-// 		const resp = await request(app).delete(`/companies/${testCompany.code}`);
-// 		expect(resp.statusCode).toEqual(200);
-// 		expect(resp.body).toEqual({
-// 			msg: "DELETED!"
-// 		});
-// 	});
+describe("DELETE /invoice/:id", () => {
+	test("Deletes invoice obj with matching id", async () => {
+		const resp = await request(app).delete(`/invoices/${testInvoice.id}`);
+		expect(resp.statusCode).toEqual(200);
+		expect(resp.body).toEqual({
+			msg: "deleted"
+		});
+	});
 
-// 	test("Returns error message if an incorrect code is requested", async () => {
-// 		const resp = await request(app).delete(`/companies/test`);
-// 		expect(resp.statusCode).toEqual(404);
-// 		expect(resp.body).toEqual({
-// 			error: {
-// 				message: "Can't find company with code 'test'",
-// 				status: 404
-// 			}
-// 		});
-// 	});
-// });
+	test("Returns error message if an incorrect id is requested", async () => {
+		const resp = await request(app).delete(`/invoices/0`);
+		expect(resp.statusCode).toEqual(404);
+		expect(resp.body).toEqual({
+			error: {
+				message: "Can't find invoice with id '0'",
+				status: 404
+			}
+		});
+	});
+});
